@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Melodothogy</title>
+<meta charset="UTF-8">
+<link rel="stylesheet"
+	href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script
+	src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+<script src="http://code.createjs.com/createjs-2013.09.25.min.js"></script>
+<script src="lib/shake.js"></script>
+<script src="lib/Box2dWeb-2.1.a.3.js"></script>
+<script src="lib/poly2tri.js"></script>
+<script src="lib/Class.js"></script>
+<script src="Main.js"></script>
+<script src="Physics.js"></script>
+<script src="Body.js"></script>
+<script src="MusicalScales.js"></script>
+<script src="Keyboard.js"></script>
+<script type="text/javascript" src="Synth.js"></script>
+<style>
+#myCanvas {
+	background-color: black;
+	border-radius: 10px
+}
+
+.instrumentBtnGroup img {
+	vertical-align: middle;
+	margin-right: 1em
+}
+
+.ui-progressbar {
+	position: relative;
+}
+
+#progressLabel {
+	position: absolute;
+	left: 50%;
+	top: 4px;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #fff
+}
+
+#appTitle {
+	text-align: center;
+	font: italic 40px times new roman, sans serif
+}
+</style>
+</head>
+<body>
+
+	<div id="loadingPage" data-role="page">
+		<div data-role="content">
+			<table style="margin: auto">
+				<tr>
+					<td><div id="appTitle">Melodothogy</div></td>
+				</tr>
+				<tr>
+					<td><img src="assets/imgs/logo.jpg" width="600px"
+						height="450px"></td>
+				</tr>
+				<tr>
+					<td><div id="loadingProgressbar"></div></td>
+				</tr>
+			</table>
+
+
+
+		</div>
+	</div>
+
+	<div id="homePage" data-role="page">
+		<div data-role="panel" id="leftPanelHome" data-display="push">
+			<ul data-role="listview" data-inset="true" data-divider-theme="d">
+				<li data-role="list-divider">Instruments</li>
+				<li>
+					<div id="instrumentBtnsHome" class="instrumentBtnGroup"
+						data-role="controlgroup">
+						<input type="radio" name="radio-choice-1" id="radio-choice-1a"
+							checked="checked" value="piano"><label
+							for="radio-choice-1a"><img
+							src="assets/imgs/piano-200x227.png" width='40' height='40'>Piano</label><input
+							type="radio" name="radio-choice-1" id="radio-choice-1b"
+							value="guitar"> <label for="radio-choice-1b"><img
+							src="assets/imgs/guitar-200x219.png" width='40' height='40'>Guitar</label><input
+							type="radio" name="radio-choice-1" id="radio-choice-1c"
+							value="violin"> <label for="radio-choice-1c"><img
+							src="assets/imgs/violin-128x128.png" width='40' height='40'>Violin</label><input
+							type="radio" name="radio-choice-1" id="radio-choice-1d"
+							value="flute"> <label for="radio-choice-1d"><img
+							src="assets/imgs/flute-200x200.png" width='40' height='40'>Flute</label>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div data-role="content">
+			<table style="background-color: #e5e5e5; border-radius: 10px">
+				<tr>
+					<td><a href="#keyboardPage" data-inline="true"><img
+							src="assets/imgs/piano_keyboard-176x176.png" width='50'
+							height='50'></a></td>
+					<td rowspan='4'><canvas id="myCanvas" width="800" height="600"></canvas></td>
+				</tr>
+				<tr>
+					<td><a href="#leftPanelHome" data-inline="true"><img
+							src="assets/imgs/settings-icon-256x256.png" width='50'
+							height='50'></a></td>
+				</tr>
+				<tr>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="keyboardPage" data-role="page">
+		<div data-role="panel" id="leftPanelKeys" data-display="push">
+			<ul data-role="listview" data-inset="true" data-divider-theme="d">
+				<li data-role="list-divider">Instruments</li>
+				<li>
+					<fieldset id="instrumentBtnsKeys" class="instrumentBtnGroup"
+						data-role="controlgroup">
+						<input type="radio" name="radio-choice-2" id="radio-choice-2a"
+							checked="checked" value="piano"><label
+							for="radio-choice-2a"><img
+							src="assets/imgs/piano-200x227.png" width='40' height='40'>Piano</label><input
+							type="radio" name="radio-choice-2" id="radio-choice-2b"
+							value="guitar"> <label for="radio-choice-2b"><img
+							src="assets/imgs/guitar-200x219.png" width='40' height='40'>Guitar</label><input
+							type="radio" name="radio-choice-2" id="radio-choice-2c"
+							value="violin"> <label for="radio-choice-2c"><img
+							src="assets/imgs/violin-128x128.png" width='40' height='40'>Violin</label><input
+							type="radio" name="radio-choice-2" id="radio-choice-2d"
+							value="flute"> <label for="radio-choice-2d"><img
+							src="assets/imgs/flute-200x200.png" width='40' height='40'>Flute</label><input
+							type="radio" name="radio-choice-2" id="radio-choice-2e"
+							value="synthesizer"> <label for="radio-choice-2e"><img
+							src="assets/imgs/synthesizer-256x256.png" width='40' height='40'
+							style="font-size: 10px">Synthesizer</label>
+					</fieldset>
+				</li>
+			</ul>
+			<select disabled id="select-scale" name="select-choice-1">
+				<option value="pythagorean">Pythagorean Scale</option>
+				<option value="dodecaphonic">Dodecaphonic Scale</option>
+				<option value="ptolemy">Ptolemy Scale</option>
+				<option value="meantone">Meantone Scale</option>
+			</select>
+		</div>
+		<div data-role="content">
+			<table style="background-color: #e5e5e5; border-radius: 10px">
+				<tr>
+					<td><a href="#homePage" data-inline="true"><img
+							src="assets/imgs/note-383x383.png" width='50' height='50'></a></td>
+					<td id="kbContainer" rowspan='3'></td>
+				</tr>
+				<tr>
+					<td><a href="#leftPanelKeys" data-inline="true"><img
+							src="assets/imgs/settings-icon-256x256.png" width='50'
+							height='50'></a></td>
+				</tr>
+				<tr>
+					<td></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+
+
+
+</body>
+</html>
