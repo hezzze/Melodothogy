@@ -21,10 +21,13 @@
 			// this.vco = vco;
 			// this.vca = vca;
 
-			this.play = function(frequency) {
+			this.play = function(frequency, type) {
+				if (type !== null) {
+					vco.type = type; 
+				}
 				vco.frequency.value = frequency;
 				vco.start(0);
-				vca.gain.value = 0.3;
+				vca.gain.value = 0.5;
 				this.isPlaying = true;
 			};
 

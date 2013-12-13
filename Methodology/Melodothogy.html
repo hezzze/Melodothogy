@@ -21,6 +21,7 @@
 <script src="Body.js"></script>
 <script src="MusicalScales.js"></script>
 <script src="Keyboard.js"></script>
+<script src="Song.js"></script>
 <script type="text/javascript" src="Synth.js"></script>
 <style>
 #myCanvas {
@@ -60,21 +61,18 @@
 					<td><div id="appTitle">Melodothogy</div></td>
 				</tr>
 				<tr>
-					<td><img src="assets/imgs/logo.jpg" width="600px"
-						height="450px"></td>
+					<td><img src="assets/imgs/logo.png" width="440px"
+						height="330px"></td>
 				</tr>
 				<tr>
 					<td><div id="loadingProgressbar"></div></td>
 				</tr>
 			</table>
-
-
-
 		</div>
 	</div>
 
 	<div id="homePage" data-role="page">
-		<div data-role="panel" id="leftPanelHome" data-display="push">
+		<div id="leftPanelHome">
 			<ul data-role="listview" data-inset="true" data-divider-theme="d">
 				<li data-role="list-divider">Instruments</li>
 				<li>
@@ -92,7 +90,11 @@
 							src="assets/imgs/violin-128x128.png" width='40' height='40'>Violin</label><input
 							type="radio" name="radio-choice-1" id="radio-choice-1d"
 							value="flute"> <label for="radio-choice-1d"><img
-							src="assets/imgs/flute-200x200.png" width='40' height='40'>Flute</label>
+							src="assets/imgs/flute-200x200.png" width='40' height='40'>Flute</label><input
+							type="radio" name="radio-choice-1" id="radio-choice-1e"
+							value="songs"> <label for="radio-choice-1e"><img
+							src="assets/imgs/music-256x256.png" width='40' height='40'
+							style="font-size: 10px">Songs</label>
 					</div>
 				</li>
 			</ul>
@@ -103,7 +105,7 @@
 					<td><a href="#keyboardPage" data-inline="true"><img
 							src="assets/imgs/piano_keyboard-176x176.png" width='50'
 							height='50'></a></td>
-					<td rowspan='4'><canvas id="myCanvas" width="800" height="600"></canvas></td>
+					<td rowspan='4'><canvas id="myCanvas" width="800" height="500"></canvas></td>
 				</tr>
 				<tr>
 					<td><a href="#leftPanelHome" data-inline="true"><img
@@ -144,12 +146,21 @@
 					</fieldset>
 				</li>
 			</ul>
-			<select disabled id="select-scale" name="select-choice-1">
-				<option value="pythagorean">Pythagorean Scale</option>
-				<option value="dodecaphonic">Dodecaphonic Scale</option>
-				<option value="ptolemy">Ptolemy Scale</option>
-				<option value="meantone">Meantone Scale</option>
-			</select>
+			<fieldset data-role="controlgroup">
+				<select id="scale-selector">
+					<option value="pythagorean">Pythagorean Scale</option>
+					<option value="eventempered">Eventempered Scale</option>
+					<option value="dodecaphonic">Dodecaphonic Scale</option>
+					<option value="ptolemy">Ptolemy Scale</option>
+				</select> <select id="type-selector">
+					<option value="0">Sine wave</option>
+					<option value="1">Square wave</option>
+					<option value="2">Saw tooth wave</option>
+					<option value="3">Triangle wave</option>
+				</select>
+			</fieldset>
+			<input type="range" id="frequency-slider" data-highlight="true"
+				disabled="disabled" min="128" max="528" value="256">
 		</div>
 		<div data-role="content">
 			<table style="background-color: #e5e5e5; border-radius: 10px">
@@ -169,9 +180,6 @@
 			</table>
 		</div>
 	</div>
-
-
-
 
 </body>
 </html>

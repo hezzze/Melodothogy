@@ -20,10 +20,46 @@ var NOTE_TYPES = ["C", "Cs", "D", "Ds", "E", "F", "Fs", "G", "Gs", "A", "As",
 var sounds = [];
 var kick;
 var INSTRUMENTS = ["piano", "guitar", "violin", "flute"];
-var currentInstruHome = "piano";
+var SONGS_DATA = [{
+	"name" : "edelweiss",
+	"roles" : {
+		"bell" : {
+			numOfNotes : 17,
+			data : [8, 4, 17, 10, 4, 12, 8, 2, 2, 3, 4, 14, 13, 8, 4, 17, 10,
+					4, 12, 8, 4, 4, 5, 6, 16, 16, 11, 1, 1, 6, 5, 4, 8, 4, 16,
+					9, 7, 11, 7, 15, 13, 8, 4, 17, 10, 4, 12, 8, 4, 4, 5, 6,
+					16, 16]
+		},
+		"flute" : {
+			numOfNotes : 17,
+			data : [8, 4, 17, 10, 4, 12, 8, 2, 2, 3, 4, 14, 13, 8, 4, 17, 10,
+					4, 12, 8, 4, 4, 5, 6, 16, 16, 11, 1, 1, 6, 5, 4, 8, 4, 16,
+					9, 7, 11, 7, 15, 13, 8, 4, 17, 10, 4, 12, 8, 4, 4, 5, 6,
+					16, 16]
+		},
+		"piano" : {
+			numOfNotes : 30,
+			data : [5, 18, 18, 2, 19, 19, 5, 18, 18, 1, 20, 20, 5, 18, 18, 5,
+					18, 18, 1, 20, 20, 2, 19, 19, 5, 21, 18, 2, 19, 19, 5, 18,
+					18, 1, 20, 20, 5, 18, 18, 2, 19, 19, 5, 18, 18, 22, 23, 24,
+					25, 26, 27, 7, 10, 12, 10, 12, 10, 7, 10, 12, 10, 12, 10,
+					8, 10, 13, 10, 13, 10, 8, 10, 13, 10, 13, 15, 6, 9, 11, 9,
+					11, 9, 7, 9, 11, 9, 11, 9, 7, 10, 12, 10, 12, 10, 7, 10,
+					12, 14, 16, 17, 5, 18, 18, 2, 19, 19, 5, 18, 18, 1, 20, 20,
+					8, 10, 13, 10, 13, 10, 3, 4, 7, 4, 7, 4, 6, 8, 10, 13, 10,
+					8, 6, 3, 28, 29, 30]
+		}
+	}
+}];
+var songs = {};
+var currentSetting = {
+	instrument : "piano"
+};
 var currentInstruKeys = "piano";
-var testNotes = ["4C", "4D", "4E", "4F", "4G", "4A", "4B"];
+var RAND_NOTES = ["4C", "4D", "4E", "4G", "4A", "5C", "5D", "5E", "5G", "5A"];
 var keyboard;
+var currentScale;
+var currentFrequency = 256;
 var canvasW;
 var canvasH;
 
@@ -63,7 +99,7 @@ function init() {
 			pgLabel.text(pgbar.progressbar("value") + "%");
 		},
 		complete : function() {
-			$.mobile.changePage("#homePage");
+			onload();
 		}
 
 	});
@@ -73,7 +109,7 @@ function init() {
 		src : "assets/imgs/note-crystal.png"
 	}];
 
-	// Load audio files
+	// Load instruments audio files
 	for (var k = 0; k < INSTRUMENTS.length; k++) {
 		var instrument = INSTRUMENTS[k];
 		for (var i = 4; i <= 5; i++) {
@@ -87,6 +123,23 @@ function init() {
 		}
 	}
 
+	// load songs audio files
+	for (var l = 0; l < SONGS_DATA.length; l++) {
+		var songData = SONGS_DATA[l];
+		var name = songData.name;
+		var roles = songData.roles;
+		for ( var role in roles) {
+			for (var m = 0; m < roles[role].numOfNotes; m++) {
+				resList.push({
+					id : name + "-" + role + "-" + (m + 1),
+					src : "assets/song/" + name + "/" + role + "/" + (m + 1)
+							+ ".mp3"
+				});
+			}
+		}
+		songs[name] = new Song(songData);
+	}
+
 	// alert("!");
 
 	// test();
@@ -96,11 +149,8 @@ function init() {
 	queue.addEventListener("progress", function(e) {
 		pgbar.progressbar("value", Math.round(e.progress * 100));
 	});
-	queue.addEventListener("complete", onload);
 	queue.loadManifest(resList);
 	queue.load();
-
-	// new ResourceLoader(resourceList, onload).load();
 
 }
 
@@ -121,9 +171,7 @@ function test() {
 	console.log("Zarlino Scale:" + zarIntervals);
 }
 
-function onload(loaded) {
-
-	// _resources = loaded;
+function onload() {
 
 	createjsInit();
 	box2dInit();
@@ -197,14 +245,8 @@ function audioInit() {
 		physics.element.addEventListener("touchstart", function(e) {
 			e.preventDefault();
 
-			if (e.touches.length === 3) {
-				var index = Math.floor(Math.random() * 7);
-				createjs.Sound.play(currentInstruHome + testNotes[index % 7]);
-				createjs.Sound.play(currentInstruHome
-						+ testNotes[(index + 2) % 7]);
-				createjs.Sound.play(currentInstruHome
-						+ testNotes[(index + 4) % 7]);
-			}
+			playWithSetting(currentSetting, e.touches.length);
+
 			var touches = e.touches;
 			for (var i = 0; i < touches.length; i++) {
 
@@ -223,19 +265,10 @@ function audioInit() {
 	physics.element.addEventListener("click", function(e) {
 		e.preventDefault();
 
-		var index = Math.floor(Math.random() * 7);
-		createjs.Sound.play(currentInstruHome + testNotes[index % 7]);
-		createjs.Sound.play(currentInstruHome + testNotes[(index + 2) % 7]);
-		createjs.Sound.play(currentInstruHome + testNotes[(index + 4) % 7]);
+		playWithSetting(currentSetting);
 
 		createNote(e.offsetX, e.offsetY);
 		generateNoteEffect(e.offsetX, e.offsetY);
-
-		for (var i = 0; i < 2; i++) {
-			var posX = Math.random() * canvasW, posY = Math.random() * canvasH;
-			createNote(posX, posY);
-			generateNoteEffect(posX, posY);
-		}
 	});
 
 	var littleStar = ["4C", "4C", "4G", "4G", "4A", "4A", "4G"];
@@ -244,16 +277,19 @@ function audioInit() {
 	window.addEventListener("shake", function() {
 		// sounds[littleStar[litterStarPos++ % littleStar.length] - 1].play();
 
-		createjs.Sound.play(currentInstruHome
-				+ (littleStar[litterStarPos++ % littleStar.length]));
+		// createjs.Sound.play(currentInstruHome+ (littleStar[litterStarPos++ %
+		// littleStar.length]));
+		playWithSetting(currentSetting);
 
 	});
-
 }
 
 function uiInit() {
 
-	var intervals = new PythagoreanScale().buildIntervals(256);
+	$.mobile.changePage("#homePage");
+
+	currentScale = new PythagoreanScale();
+	var intervals = currentScale.buildIntervals(256);
 
 	keyboard = new Keyboard(800, 300, intervals, function(i) {
 		var octave = Math.floor(i / 12);
@@ -264,24 +300,181 @@ function uiInit() {
 	keyboard.playMode = keyboard.SAMPLE;
 
 	$("#kbContainer").append(keyboard.init());
-	$('#instrumentBtnsHome input').click(function() {
-		currentInstruHome = this.value;
+
+	$("#leftPanelHome")
+			.append(
+					"<ul id='songChooser' ><li id='songLabel' data-role='list-divider'>Song</li>"
+							+ "<li><select id='song-selector' name='select-1'></select></li></ul>");
+
+	$("#songChooser").listview({
+		inset : true,
+		dividerTheme : "d"
+	});
+
+	for ( var name in songs) {
+		var options = "";
+		for ( var role in songs[name].datas) {
+			options += "<option value='" + name + "-" + role + "'>" + role
+					+ "</option>";
+		}
+		$("#song-selector").append(
+				"<optgroup label=" + name[0].toUpperCase() + name.substr(1)
+						+ ">" + options + "</optgroup>");
+
+	}
+
+	$("#song-selector").selectmenu();
+	$("#song-selector").selectmenu("disable");
+
+	$("#leftPanelHome").panel({
+		display : "push"
+	});
+
+	$("#song-selector").change(function() {
+		var values = this.value.split("-");
+		currentSetting.song = {
+			name : values[0],
+			role : values[1]
+		};
+
 		// alert(this.value);
 	});
+
+	$('#instrumentBtnsHome input').click(
+			function() {
+				if (this.value === "songs") {
+					$("#songLabel").text(
+							"Song: " + SONGS_DATA[0].name[0].toUpperCase()
+									+ SONGS_DATA[0].name.substr(1));
+					var songSelector = $("#song-selector");
+					songSelector.selectmenu("enable");
+					var values = songSelector.val().split("-");
+					currentSetting.song = {
+						name : values[0],
+						role : values[1]
+					};
+				} else {
+					$("#song-selector").selectmenu("disable");
+					currentSetting.song = null;
+					for ( var s in songs) {
+						songs[s].rewind();
+					}
+					currentSetting.instrument = this.value;
+				}
+				// alert(this.value);
+			});
+
+	$('#leftPanelHome').trigger("updatelayout");
+
+	$("#scale-selector").selectmenu();
+	$("#type-selector").selectmenu();
+	$("#scale-selector").selectmenu("disable");
+	$("#type-selector").selectmenu("disable");
+	
+
 	$('#instrumentBtnsKeys input').click(function() {
 		if (this.value === "synthesizer") {
 			keyboard.playMode = keyboard.SYNTHESIZE;
-			$("#select-scale").selectmenu("enable");
+			$("#scale-selector").selectmenu("enable");
+			$("#type-selector").selectmenu("enable");
+			$("#frequency-slider").slider("enable");
 		} else {
 			currentInstruKeys = this.value;
 			keyboard.playMode = keyboard.SAMPLE;
-			$("#select-scale").selectmenu("disable");
+			$("#scale-selector").selectmenu("disable");
+			$("#type-selector").selectmenu("disable");
+			$("#frequency-slider").slider("disable");
 		}
 		// alert(this.value);
 	});
-	$("#select-scale").change(function() {
-		alert(this.value);
+
+	// TODO
+	$("#scale-selector").change(
+			function() {
+				var scale = this.value;
+				if (scale === "pythagorean") {
+					currentScale = new PythagoreanScale();
+				} else if (scale === "dodecaphonic") {
+					currentScale = new DodecaphonicScale();
+				} else if (scale === "eventempered") {
+					currentScale = new EvenTemperedScale();
+				} else if (scale === "ptolemy") {
+					currentScale = new PtolemyScale();
+				}
+				keyboard.intervals = currentScale.buildIntervals($(
+						"#frequency-slider").val());
+				console.log(keyboard.intervals);
+				// alert(this.value);
+			});
+
+	$("#type-selector").change(function() {
+		keyboard.oscillatorType = parseInt(this.value);
 	});
+
+	$("#frequency-slider").change(function() {
+		keyboard.baseFrequency = this.value;
+		keyboard.intervals = currentScale.buildIntervals(this.value);
+	});
+
+}
+
+function playWithSetting(setting, fingerNumber) {
+	if (setting.song) {
+		playSong(setting.song.name, setting.song.role);
+	} else {
+		if (!fingerNumber) {
+			fingerNumber = Math.floor(Math.random() * 3 + 1);
+			for (var i = 0; i < fingerNumber - 1; i++) {
+				var posX = Math.random() * canvasW, posY = Math.random()
+						* canvasH;
+				createNote(posX, posY);
+				generateNoteEffect(posX, posY);
+			}
+		}
+
+		var instrument = setting.instrument || "piano";
+		playRandom(fingerNumber, instrument);
+	}
+}
+
+function playSong(name, role) {
+	createjs.Sound.play(songs[name].getNextSourceId(role));
+}
+
+// TODO
+function playRandom(fingerN, instrument) {
+	var len = RAND_NOTES.length;
+	var index = Math.floor(Math.random() * len);
+	switch (fingerN) {
+		case 1 :
+			createjs.Sound.play(instrument + RAND_NOTES[index]);
+			break;
+		case 2 :
+			createjs.Sound.play(instrument + RAND_NOTES[index]);
+			createjs.Sound.play(instrument
+					+ RAND_NOTES[randOffset(index, len, Math.random() > 0.5)]);
+			break;
+		case 3 :
+			createjs.Sound.play(instrument + RAND_NOTES[index]);
+			createjs.Sound
+					.play(instrument + RAND_NOTES[randOffset(index, len)]);
+			createjs.Sound.play(instrument
+					+ RAND_NOTES[randOffset(index, len, true)]);
+			break;
+	}
+
+}
+
+function randOffset(index, length, downward) {
+	var offset = Math.floor(Math.random() * 2) + 2;
+	if (downward) {
+		index -= offset;
+		index = index < 0 ? index + length : index;
+	} else {
+		index = (index + offset) % length;
+	}
+	return index;
+
 }
 
 function createNote(posX, posY) {
@@ -325,26 +518,6 @@ function createNote(posX, posY) {
 
 	}
 
-}
-
-function playWithSetting(setting) {
-	if (setting.song) {
-		playSong(song);
-	} else {
-		var fingerNumber = setting.fingerNumber
-				|| Math.floor(Math.random() * 5 + 1);
-		var instrument = setting.instrument || "piano";
-		playRandom(fingerNumber, instrument);
-	}
-}
-
-//TODO
-function playSong() {
-	
-}
-
-function playRandom() {
-	
 }
 
 function generateNoteEffect(posX, posY, frequency) {

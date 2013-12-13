@@ -10,7 +10,7 @@
 var MusicalScale = Class
 		.extend({
 			init : function(fundamental) {
-				this.DEFAULT_FUNDAMENTAL = 528;
+				this.DEFAULT_FUNDAMENTAL = 256;
 			},
 
 			getFactor : function(intervalNumber) {

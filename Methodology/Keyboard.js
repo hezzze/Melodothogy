@@ -3,9 +3,16 @@
  */
 (function(window) {
 
+	var SINE = 0;
+	var SQUARE = 1;
+	var SAWTOOTH = 2;
+	var TRIANGLE = 3;
+	
 	function Keyboard(width, height, intervals, callback) {
-
+	
 		this.intervals = intervals;
+		this.oscillatorType = SINE;
+		this.baseFrequency = 256;
 		if (!intervals || !(intervals instanceof Array)
 				|| !(intervals.length === 12))
 			throw Error("Illegal intervals");
@@ -24,7 +31,7 @@
 		var playNote = function(self, i) {
 			if (self.playMode === self.SYNTHESIZE || !callback) {
 				var octave = Math.floor(i / 12);
-				synths[i].play(self.intervals[i % 12] * Math.pow(2, octave));
+				synths[i].play(self.intervals[i % 12] * Math.pow(2, octave), self.oscillatorType);
 			} else {
 				callback(i);
 			}
