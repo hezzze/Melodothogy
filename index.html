@@ -16,13 +16,13 @@
 <script src="lib/Box2dWeb-2.1.a.3.js"></script>
 <script src="lib/poly2tri.js"></script>
 <script src="lib/Class.js"></script>
-<script src="Main.js"></script>
-<script src="Physics.js"></script>
-<script src="Body.js"></script>
-<script src="MusicalScales.js"></script>
-<script src="Keyboard.js"></script>
-<script src="Song.js"></script>
-<script type="text/javascript" src="Synth.js"></script>
+<script src="src/Main.js"></script>
+<script src="src/Physics.js"></script>
+<script src="src/Body.js"></script>
+<script src="src/MusicalScales.js"></script>
+<script src="src/Keyboard.js"></script>
+<script src="src/Song.js"></script>
+<script type="text/javascript" src="src/Synth.js"></script>
 <style>
 #myCanvas {
 	background-color: black;
@@ -123,42 +123,37 @@
 		<div data-role="panel" id="leftPanelKeys" data-display="push">
 			<ul data-role="listview" data-inset="true" data-divider-theme="d">
 				<li data-role="list-divider">Instruments</li>
-				<li>
-					<fieldset id="instrumentBtnsKeys" class="instrumentBtnGroup"
-						data-role="controlgroup">
-						<input type="radio" name="radio-choice-2" id="radio-choice-2a"
-							checked="checked" value="piano"><label
-							for="radio-choice-2a"><img
-							src="assets/imgs/piano-200x227.png" width='40' height='40'>Piano</label><input
-							type="radio" name="radio-choice-2" id="radio-choice-2b"
-							value="guitar"> <label for="radio-choice-2b"><img
-							src="assets/imgs/guitar-200x219.png" width='40' height='40'>Guitar</label><input
-							type="radio" name="radio-choice-2" id="radio-choice-2c"
-							value="violin"> <label for="radio-choice-2c"><img
-							src="assets/imgs/violin-128x128.png" width='40' height='40'>Violin</label><input
-							type="radio" name="radio-choice-2" id="radio-choice-2d"
-							value="flute"> <label for="radio-choice-2d"><img
-							src="assets/imgs/flute-200x200.png" width='40' height='40'>Flute</label><input
-							type="radio" name="radio-choice-2" id="radio-choice-2e"
-							value="synthesizer"> <label for="radio-choice-2e"><img
-							src="assets/imgs/synthesizer-256x256.png" width='40' height='40'
-							style="font-size: 10px">Synthesizer</label>
-					</fieldset>
+				<li>src/
+					<input type="radio" name="radio-choice-2" id="radio-choice-2a"
+						checked="checked" value="piano"><label
+						for="radio-choice-2a"><img
+						src="assets/imgs/piano-200x227.png" width='40' height='40'>Piano</label><input
+						type="radio" name="radio-choice-2" id="radio-choice-2b"
+						value="guitar"> <label for="radio-choice-2b"><img
+						src="assets/imgs/guitar-200x219.png" width='40' height='40'>Guitar</label><input
+						type="radio" name="radio-choice-2" id="radio-choice-2c"
+						value="violin"> <label for="radio-choice-2c"><img
+						src="assets/imgs/violin-128x128.png" width='40' height='40'>Violin</label><input
+						type="radio" name="radio-choice-2" id="radio-choice-2d"
+						value="flute"> <label for="radio-choice-2d"><img
+						src="assets/imgs/flute-200x200.png" width='40' height='40'>Flute</label><input
+						type="radio" name="radio-choice-2" id="radio-choice-2e"
+						value="synthesizer"> <label for="radio-choice-2e"><img
+						src="assets/imgs/synthesizer-256x256.png" width='40' height='40'
+						style="font-size: 10px">Synthesizer</label>
 				</li>
 			</ul>
-			<fieldset data-role="controlgroup">
-				<select id="scale-selector">
-					<option value="pythagorean">Pythagorean Scale</option>
-					<option value="eventempered">Eventempered Scale</option>
-					<option value="dodecaphonic">Dodecaphonic Scale</option>
-					<option value="ptolemy">Ptolemy Scale</option>
-				</select> <select id="type-selector">
-					<option value="0">Sine wave</option>
-					<option value="1">Square wave</option>
-					<option value="2">Saw tooth wave</option>
-					<option value="3">Triangle wave</option>
-				</select>
-			</fieldset>
+			<select id="scale-selector">
+				<option value="pythagorean">Pythagorean Scale</option>
+				<option value="eventempered">Eventempered Scale</option>
+				<option value="dodecaphonic">Dodecaphonic Scale</option>
+				<option value="ptolemy">Ptolemy Scale</option>
+			</select> <select id="type-selector">
+				<option value="0">Sine wave</option>
+				<option value="1">Square wave</option>
+				<option value="2">Saw tooth wave</option>
+				<option value="3">Triangle wave</option>
+			</select>
 			<input type="range" id="frequency-slider" data-highlight="true"
 				disabled="disabled" min="128" max="528" value="256">
 		</div>
